@@ -27,6 +27,15 @@ class PatientService {
   }
 }
 
+// Servicio que simula el servicio real
+class MockPacientService extends PatientService {
+  @override
+  // Método para devolver un paciente de test
+  Future<Patient> getRandomPatient() {
+    return Future(() => const Patient(id: 1, name: 'Tester', surname: 'McTesting', code: '314-42-2001'));
+  }
+}
+
 // Modelo para el paciente, parte del patrón Provider
 class PatientModel with ChangeNotifier {
   // Atributos para la actuar en función de lo que se esté haciendo
@@ -38,6 +47,13 @@ class PatientModel with ChangeNotifier {
   String get info => _info;
   bool get loading => _loading;
 
+  // Gestión del servicio del modelo
+  late PatientService service;
+
+  PatientModel({service}) {
+    this.service = service ?? PatientService();
+  }
+
   // Método del modelo que se llama desde los botones de la vista
   Future<void> getRandomPatient() async {
     // Establecemos que está cargando y se avisa a los oyentes
@@ -45,7 +61,7 @@ class PatientModel with ChangeNotifier {
     notifyListeners();
     // Hacemos la llamda al servicio
     try {
-      _patient = await PatientService().getRandomPatient();
+      _patient = await service.getRandomPatient();
       // Gestionamos los posibles errores
     } catch (e) {
       _patient = null;

@@ -16,19 +16,32 @@ void main() {
   testWidgets('Test PatientViewer displays patient data correctly',
       (WidgetTester tester) async {
     // Creamos una instancia de PatientModel
-    final patientModel = PatientModel();
+    final patientModel = PatientModel(service: MockPacientService());
 
-    // Inicializamos la aplicación con el PatientModel en el Provider
+    // Construimos el widget bajo prueba
     await tester.pumpWidget(
-      ChangeNotifierProvider<PatientModel>.value(
-        value: patientModel,
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => patientModel),
+        ],
         child: const MaterialApp(
-          home: Scaffold(body: PatientViewer(textSize: 16)),
+          home: MobilePage(),
         ),
       ),
     );
 
-    // Verificamos que se muestra el mensaje inicial
-    expect(find.text('Haga click para obtener un paciente'), findsOneWidget);
+    // Verificamos que inicialmente no hay un paciente (esto depende de tu lógica inicial)
+    expect(find.textContaining('ID:'), findsNothing);
+
+    // Simulamos un clic en el botón flotante
+    final floatingActionButton = find.byType(FloatingActionButton);
+    expect(floatingActionButton, findsOneWidget);
+
+    await tester.tap(floatingActionButton);
+    await tester.pump(const Duration(seconds: 5)); // Redibuja la UI después del cambio, esperando más tiempo que la petición
+
+    // Verificamos que ahora se muestra información del paciente, y que tiene nombre 'Tester'
+    expect(find.byKey(const Key('patientViewerName')), findsOneWidget);
+    expect(find.textContaining('Tester'), findsOneWidget);
   });
 }

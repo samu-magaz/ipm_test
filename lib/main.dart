@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         // ChangeNotifierProvider(create: (_) => CounterModel()),
-        ChangeNotifierProvider(create: (_) => PatientModel()),
+        ChangeNotifierProvider(create: (_) => PatientModel(service: MockPacientService())),
       ],
       child: MaterialApp(
         title: 'Flutter Wear & Mobile Example',
@@ -74,6 +74,7 @@ class PatientViewer extends StatelessWidget {
                         style: TextStyle(fontSize: textSize),
                       ),
                       Text(
+                        key: const Key('patientViewerName'),
                         'Name: ${patientModel.patient?.name}',
                         style: TextStyle(fontSize: textSize),
                       ),
